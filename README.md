@@ -1,36 +1,158 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Teresa Kae — Portfolio
+
+Personal portfolio site. Showcasing a craft-driven iOS Developer with a product conscience. Currently building at the Apple Developer Academy, Bali Cohort 2026.
+
+---
+
+## Tech Stack
+
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 16+ (App Router) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS v4 |
+| Animations | Framer Motion |
+| Smooth Scroll | @studio-freight/react-lenis |
+| Fonts | DM Sans + Cormorant Garamond via `next/font/google` |
+| Markdown | `react-markdown` + `remark-gfm` |
+
+---
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+src/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx                  # Home
+│   ├── globals.css
+│   └── projects/
+│       ├── page.tsx              # /projects listing
+│       └── [id]/
+│           └── page.tsx          # /projects/[id] detail
+├── components/
+│   ├── layout/
+│   │   ├── LenisProvider.tsx
+│   │   ├── Navbar.tsx
+│   │   └── SiteShell.tsx
+│   ├── sections/
+│   │   ├── About.tsx
+│   │   ├── BeyondCode.tsx
+│   │   ├── Hero.tsx
+│   │   ├── Projects.tsx
+│   │   ├── Timeline.tsx
+│   │   └── Workflow.tsx
+│   └── ui/
+│       ├── FlipCard.tsx
+│       ├── LayoutPreloader.tsx
+│       ├── MagneticGlowButton.tsx
+│       ├── ParallaxFloating.tsx
+│       ├── ProjectCard.tsx
+│       ├── ProjectLightbox.tsx
+│       ├── ProjectMarquee.tsx
+│       ├── ProjectsDetail.tsx
+│       └── TextRotate.tsx
+├── data/
+│   └── projects.ts               # PROJECTS array + Project interface
+├── hooks/
+│   ├── useLenis.ts
+│   └── useMousePositionRef.ts
+└── lib/
+    └── utils.ts
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Design System
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Colors
 
-## Deploy on Vercel
+| Variable | Value | Usage |
+|---|---|---|
+| `--color-bg` | `#050810` | Page background |
+| `--color-surface` | `#0d1117` | Card surfaces |
+| `--color-text` | `rgba(255,255,255,0.92)` | Primary text |
+| `--color-text-secondary` | `rgba(255,255,255,0.55)` | Body copy |
+| `--color-accent` | `#699bff` | Links, highlights |
+| `--color-dot-green` | `#34d399` | Availability indicator |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Typography
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**DM Sans** (`--font-sans`) — weights 300, 400, 500 only.
+
+**Cormorant Garamond** (`--font-display`) — weights 300, 400, 600, always italic. Used for all display headings.
+
+### Spacing
+
+All spacing uses `clamp()` for fluid scaling:
+
+```css
+--space-section-y: clamp(6rem, 12vw, 10rem);
+--space-section-x: clamp(1.5rem, 6vw, 5rem);
+```
+
+---
+
+## Pages
+
+### Home (`/`)
+
+Sections in order: `Hero → Projects (peek) → About → BeyondCode → Timeline`
+
+The `<Projects peek />` prop hides the section header and removes top padding so the first project card peeks above the fold, driving scroll engagement.
+
+### Projects (`/projects`)
+
+Full listing with filter bar: `All · Completed · In Progress · Concept`. Featured editorial block for `featured: true` projects, then category-grouped cards below.
+
+### Project Detail (`/projects/[id]`)
+
+Bento above-the-fold layout with tabbed content: Overview · Blueprint · Visuals.
+
+---
+
+## Data
+
+All project content lives in `src/data/projects.ts`. To add or update a project, edit only this file — no component changes needed.
+
+```typescript
+export interface Project {
+  id: string;
+  title: string;
+  tagline: string;
+  year: string;
+  status: 'Completed' | 'In Progress' | 'Concept';
+  category: string[];
+  tech: string[];
+  coverGradient: string;
+  coverImage?: string;
+  featured: boolean;
+  tabs: {
+    overview: { description: string; platform: string; };
+    blueprint: { notes: string; };   // Markdown
+    visuals: { images: string[]; };
+  };
+}
+```
+
+---
+
+## Architecture Notes
+
+- **Never** use `window.scroll` or `document.scroll` — all scroll detection goes through `useLenis(({ scroll }) => ...)`
+- Framer Motion ease tuples must be cast: `ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number]`
+- Tailwind CSS v4: use `@import "tailwindcss"` only, never `@tailwind` directives
+- `<LenisProvider>` wraps the app once in `layout.tsx` — never instantiate Lenis elsewhere
+
+---
