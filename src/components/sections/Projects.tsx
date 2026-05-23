@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion, Variants } from 'framer-motion';
 import { PROJECTS } from '@/data/projects';
+import { useEffect, useState } from 'react';
 
 const STATUS_STYLES: Record<string, React.CSSProperties> = {
   Completed:     { color: '#34d399', backgroundColor: 'rgba(52,211,153,0.12)',  borderColor: 'rgba(52,211,153,0.25)'  },
@@ -20,14 +21,27 @@ const rowVariants: Variants = {
   visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
 };
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
+
 export default function Projects() {
-  const topProjects = PROJECTS.filter((p) => p.featured).slice(0, 3);
+  const isMobile = useIsMobile();
+  const allProjects = PROJECTS.filter((p) => p.featured).slice(0, 3);
+  const topProjects = allProjects;
 
   return (
     <section
       id="projects"
       style={{
-        marginTop: '-30vh',
+        marginTop: isMobile ? '-20vh' : '-30vh',
         paddingTop: 0,
         paddingBottom: 0,
         overflow: 'visible',
@@ -42,10 +56,10 @@ export default function Projects() {
         viewport={{ once: true, margin: '-40px' }}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '20px',
-          paddingLeft:  'clamp(1.5rem, 4vw, 3rem)',
-          paddingRight: 'clamp(1.5rem, 4vw, 3rem)',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+          gap: isMobile ? '16px' : '20px',
+          paddingLeft:  isMobile ? '1rem' : 'clamp(1.5rem, 4vw, 3rem)',
+          paddingRight: isMobile ? '1rem' : 'clamp(1.5rem, 4vw, 3rem)',
           alignItems: 'stretch',
         }}
       >
@@ -72,7 +86,7 @@ export default function Projects() {
                 }}
               >
                 <div style={{
-                  height:     'clamp(280px, 35vw, 420px)',
+                  height:     isMobile ? '200px' : 'clamp(280px, 35vw, 420px)',
                   flexShrink: 0,
                   background: project.coverImage
                     ? `url(${project.coverImage}) center / cover no-repeat`
@@ -116,7 +130,7 @@ export default function Projects() {
                     <h3 style={{
                       fontFamily:    'var(--font-display)',
                       fontStyle:     'italic',
-                      fontSize:      'clamp(1.2rem, 2vw, 1.75rem)',
+                      fontSize:      isMobile ? '1.3rem' : 'clamp(1.2rem, 2vw, 1.75rem)',
                       fontWeight:    300,
                       color:         'rgba(255,255,255,0.95)',
                       letterSpacing: '-0.02em',

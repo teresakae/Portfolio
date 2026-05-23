@@ -3,7 +3,7 @@ import About from "@/components/sections/About";
 import BeyondCode from "@/components/sections/BeyondCode";
 import Projects from "@/components/sections/Projects";
 import Timeline from "@/components/sections/Timeline";
-import CTA, { CTAFooter } from '@/components/sections/CTA'; 
+import CTA from "@/components/sections/CTA";
 
 export default function Home() {
   return (
@@ -16,7 +16,6 @@ export default function Home() {
         <Timeline />
         <CTA />
       </main>
-      <CTAFooter />
     </>
   );
 }

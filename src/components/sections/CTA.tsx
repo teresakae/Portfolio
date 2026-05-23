@@ -1,8 +1,19 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
 
 const BODY_TEXT =
   "I learned design the hard way — through curiosity that wouldn't rest, mistakes that wouldn't be ignored, and iteration that wouldn't stop. What pulled me in was never just the surface, but the machinery beneath it. The patterns, the systems, the logic that makes everything else possible.";
@@ -11,7 +22,7 @@ const sectionVariants: Variants = {
   hidden:  { opacity: 0, y: 48 },
   visible: {
     opacity: 1, y: 0,
-    transition: { duration: 0.95, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.95, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] },
   },
 };
 
@@ -19,7 +30,7 @@ const headingVariants: Variants = {
   hidden:  { opacity: 0, y: 32, filter: 'blur(6px)' },
   visible: {
     opacity: 1, y: 0, filter: 'blur(0px)',
-    transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 },
+    transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] as [number,number,number,number], delay: 0.1 },
   },
 };
 
@@ -27,14 +38,8 @@ const bodyVariants: Variants = {
   hidden:  { opacity: 0, y: 20 },
   visible: {
     opacity: 1, y: 0,
-    transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1], delay: 0.28 },
+    transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] as [number,number,number,number], delay: 0.28 },
   },
-};
-
-const iconVariants: Variants = {
-  rest:  { scale: 1 },
-  hover: { scale: 1.2, transition: { type: 'spring', stiffness: 380, damping: 16 } },
-  tap:   { scale: 0.92, transition: { type: 'spring', stiffness: 500, damping: 24 } },
 };
 
 const SOCIALS = [
@@ -80,65 +85,8 @@ const SOCIALS = [
   },
 ];
 
-export function CTAFooter() {
-  return (
-    <footer
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: '1.5rem',
-        paddingBottom: '2rem',
-        paddingLeft: 'var(--space-section-x)',
-        paddingRight: 'var(--space-section-x)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-      }}
-    >
-      <span
-        style={{
-          fontFamily: 'var(--font-sans)',
-          fontWeight: 300,
-          fontSize: '0.75rem',
-          letterSpacing: '0.06em',
-          color: 'rgba(255,255,255,0.2)',
-        }}
-      >
-        © {new Date().getFullYear()} Teresa Kae
-      </span>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        {SOCIALS.map(({ label, href, icon }) => (
-          <motion.a
-            key={label}
-            href={href}
-            aria-label={label}
-            target={href.startsWith('mailto') ? undefined : '_blank'}
-            rel={href.startsWith('mailto') ? undefined : 'noopener noreferrer'}
-            variants={iconVariants}
-            initial="rest"
-            whileHover="hover"
-            whileTap="tap"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'rgba(255,255,255,0.28)',
-              textDecoration: 'none',
-              cursor: 'pointer',
-              transition: 'color 0.2s ease',
-            }}
-            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.75)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.28)'; }}
-          >
-            {icon}
-          </motion.a>
-        ))}
-      </div>
-    </footer>
-  );
-}
-
 export default function CTA() {
+  const isMobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
   const [mask, setMask] = useState<string>(
     'radial-gradient(circle 0px at -999px -999px, black 0%, transparent 100%)'
@@ -165,7 +113,6 @@ export default function CTA() {
     lineHeight: 1.28,
     letterSpacing: '-0.03em',
     textAlign: 'justify',
-    textJustify: 'inter-word' as any,
     textAlignLast: 'left',
     margin: 0,
     hyphens: 'auto',
@@ -174,12 +121,14 @@ export default function CTA() {
 
   return (
     <motion.section
+      id="contact"
       variants={sectionVariants}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: false, margin: '-80px' }}
       style={{
         position: 'relative',
+        zIndex: 2,
         paddingTop:    'clamp(8rem, 15vw, 14rem)',
         paddingBottom: 'clamp(6rem, 10vw, 10rem)',
         paddingLeft:   'clamp(0.75rem, 1.5vw, 1.5rem)',
@@ -209,41 +158,47 @@ export default function CTA() {
       <motion.div
         variants={bodyVariants}
         ref={containerRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        onMouseMove={!isMobile ? handleMouseMove : undefined}
+        onMouseLeave={!isMobile ? handleMouseLeave : undefined}
         style={{
           position: 'relative',
           width: '100%',
-          cursor: 'crosshair',
+          cursor: isMobile ? 'default' : 'crosshair',
           marginBottom: 'clamp(1.5rem, 3vw, 2.5rem)',
         }}
       >
-        <p style={{ ...bodyStyle, color: 'rgba(255,255,255,0.11)', userSelect: 'none' }}>
+        <p style={{
+          ...bodyStyle,
+          color: isMobile ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.11)',
+          userSelect: 'none',
+        }}>
           {BODY_TEXT}
         </p>
 
-        <p
-          aria-hidden="true"
-          style={{
-            ...bodyStyle,
-            color: 'rgba(255,255,255,0.82)',
-            position: 'absolute',
-            inset: 0,
-            WebkitMaskImage: mask,
-            maskImage: mask,
-            userSelect: 'none',
-            pointerEvents: 'none',
-          }}
-        >
-          {BODY_TEXT}
-        </p>
+        {!isMobile && (
+          <p
+            aria-hidden="true"
+            style={{
+              ...bodyStyle,
+              color: 'rgba(255,255,255,0.82)',
+              position: 'absolute',
+              inset: 0,
+              WebkitMaskImage: mask,
+              maskImage: mask,
+              userSelect: 'none',
+              pointerEvents: 'none',
+            }}
+          >
+            {BODY_TEXT}
+          </p>
+        )}
       </motion.div>
 
       <motion.div
         initial={{ scaleY: 0, opacity: 0 }}
         whileInView={{ scaleY: 1, opacity: 1 }}
         viewport={{ once: false }}
-        transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.45 }}
+        transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] as [number,number,number,number], delay: 0.45 }}
         style={{
           width: '1px',
           height: '56px',
@@ -257,7 +212,7 @@ export default function CTA() {
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false }}
-        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1], delay: 0.55 }}
+        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] as [number,number,number,number], delay: 0.55 }}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -265,17 +220,15 @@ export default function CTA() {
           gap: '1.75rem',
         }}
       >
-        <p
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontStyle: 'italic',
-            fontWeight: 300,
-            fontSize: 'clamp(0.95rem, 1.4vw, 1.15rem)',
-            letterSpacing: '0.01em',
-            color: 'rgba(255,255,255,0.55)',
-            margin: 0,
-          }}
-        >
+        <p style={{
+          fontFamily: 'var(--font-display)',
+          fontStyle: 'italic',
+          fontWeight: 300,
+          fontSize: 'clamp(0.95rem, 1.4vw, 1.15rem)',
+          letterSpacing: '0.01em',
+          color: 'rgba(255,255,255,0.55)',
+          margin: 0,
+        }}>
           If any of this resonates —
         </p>
 

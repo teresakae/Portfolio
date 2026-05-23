@@ -34,7 +34,7 @@ export default function ProjectDetailPage() {
     <main style={{
       backgroundColor: 'var(--color-bg, #050810)',
       minHeight: '100vh',
-      padding: 'clamp(5rem, 8vw, 6.5rem) clamp(1rem, 3vw, 2rem) clamp(4rem, 8vw, 6rem)',
+      padding: 'clamp(3.5rem, 6vw, 4.5rem) clamp(1rem, 3vw, 2rem) clamp(4rem, 8vw, 6rem)',
     }}>
 
       <motion.button

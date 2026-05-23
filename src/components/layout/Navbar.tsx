@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { useLenis } from "@/hooks/useLenis";
@@ -40,12 +41,16 @@ const itemVariants: Variants = {
 };
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isProjectDetail = /^\/projects\/[^/]+$/.test(pathname);
   const [scrolled, setScrolled]     = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useLenis(({ scroll }) => {
     setScrolled(scroll > 60);
   });
+
+  if (isProjectDetail) return null;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-5 px-4 pointer-events-none">

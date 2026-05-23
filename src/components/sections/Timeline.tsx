@@ -1,7 +1,7 @@
 'use client';
-
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
+
 
 const EVENTS = [
   {
@@ -160,9 +160,22 @@ function TimelineNode({
   );
 }
 
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
+
 export default function Timeline() {
   const headingRef = useRef<HTMLDivElement>(null);
   const inView = useInView(headingRef, { once: false, amount: 0.4 });
+  const isMobile = useIsMobile();
 
   return (
     <section
@@ -180,7 +193,7 @@ export default function Timeline() {
           maxWidth: '1200px',
           margin: '0 auto',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
           gap: 'clamp(3rem, 8vw, 6rem)',
           alignItems: 'start',
         }}
@@ -188,8 +201,8 @@ export default function Timeline() {
         <div
           ref={headingRef}
           style={{
-            position: 'sticky',
-            top: 'clamp(6rem, 10vw, 8rem)',
+            position: isMobile ? 'relative' : 'sticky',
+            top: isMobile ? 'auto' : 'clamp(6rem, 10vw, 8rem)',
           }}
         >
           <motion.span

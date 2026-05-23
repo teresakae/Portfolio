@@ -41,7 +41,7 @@ export default function ProjectCard({
         whileHover={{ y: -4, borderColor: 'rgba(255,255,255,0.14)' }}
         transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
         style={{
-          width: '320px',
+          width: '100%',
           flexShrink: 0,
           borderRadius: '14px',
           border: '1px solid rgba(255,255,255,0.08)',

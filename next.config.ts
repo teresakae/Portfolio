@@ -1,4 +1,11 @@
 import type { NextConfig } from "next";
+import os from "os";
+
+
+const localIps = Object.values(os.networkInterfaces())
+  .flat()
+  .filter((iface) => iface?.family === "IPv4" && !iface?.internal)
+  .map((iface) => iface?.address as string);
 
 const nextConfig: NextConfig = {
   images: {
@@ -13,6 +20,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["framer-motion"],
   },
+  allowedDevOrigins: localIps, 
 };
 
 export default nextConfig;
