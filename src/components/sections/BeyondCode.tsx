@@ -100,7 +100,6 @@ function FlyCard({ card, globalScroll }: { card: CardData; globalScroll: MotionV
   );
 }
 
-// ── Mobile swipe stack ────────────────────────────────────────────────────
 function SwipeCard({
   src, index, stackY, stackRotate, isFlung, isTop, onFling, isInView,
 }: {
@@ -312,7 +311,6 @@ function MobileVersion() {
   );
 }
 
-// ── Main export ───────────────────────────────────────────────────────────
 export default function BeyondCode() {
   const [isMobile, setIsMobile] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -407,7 +405,6 @@ function DesktopVersion() {
         overflow: 'hidden',
         zIndex: 100,
       }}>
-        {/* Progress bar — inside sticky container so it moves with it */}
         <div
           ref={barRef}
           style={{

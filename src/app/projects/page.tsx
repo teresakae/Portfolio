@@ -10,6 +10,18 @@ import ProjectCard from '@/components/ui/ProjectCard';
 type FilterStatus = 'All' | Project['status'];
 const FILTERS: FilterStatus[] = ['All', 'Completed', 'In Progress', 'Concept'];
 
+const CATEGORY_ORDER = ['AI/ML', 'iOS', 'Desktop App', 'Web', 'Product', 'Foundational'];
+
+const CATEGORY_ALIAS: Record<string, string> = {
+  'AI/ML':                'AI/ML',
+  'Accessibility':        'AI/ML',
+  'iOS':                  'iOS',
+  'Desktop App':          'Desktop App',
+  'Web':                  'Web',
+  'Product':              'Product',
+  'Foundational':         'Foundational',
+};
+
 const pageIn: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -40,6 +52,11 @@ function getLastUpdated(): string {
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const now = new Date();
   return `${months[now.getMonth()]} ${now.getFullYear()}`;
+}
+
+function resolveGroup(project: Project): string {
+  const primary = project.category[0] ?? '';
+  return CATEGORY_ALIAS[primary] ?? 'Other';
 }
 
 function CategoryGroup({ name, projects }: { name: string; projects: Project[] }) {
@@ -114,14 +131,19 @@ export default function ProjectsPage() {
   const featuredStack = featured.slice(1, 3);
 
   const categoryGroups = useMemo(() => {
-    const nonFeatured = PROJECTS.filter((p) => !p.featured);
     const map = new Map<string, Project[]>();
-    for (const p of nonFeatured) {
-      const key = p.category[0] ?? 'Other';
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(p);
+
+    for (const name of CATEGORY_ORDER) {
+      map.set(name, []);
     }
-    return Array.from(map.entries());
+
+    for (const p of PROJECTS) {
+      const group = resolveGroup(p);
+      if (!map.has(group)) map.set(group, []);
+      map.get(group)!.push(p);
+    }
+
+    return Array.from(map.entries()).filter(([, projects]) => projects.length > 0);
   }, []);
 
   const isFiltered = filter !== 'All';
@@ -250,10 +272,8 @@ export default function ProjectsPage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
           >
-
             {heroProject && (
               <div style={{ marginBottom: 'clamp(2rem, 4vw, 3rem)' }}>
-
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -287,7 +307,6 @@ export default function ProjectsPage() {
                   height: '340px',
                   alignItems: 'stretch',
                 }}>
-
                   <Link
                     href={`/projects/${heroProject.id}`}
                     style={{ textDecoration: 'none', display: 'block', height: '100%' }}
@@ -311,25 +330,16 @@ export default function ProjectsPage() {
                         <img
                           src={heroProject.coverImage}
                           alt={heroProject.title}
-                          style={{
-                            position: 'absolute',
-                            inset: 0,
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            objectPosition: 'center',
-                          }}
+                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
                         />
                       ) : (
                         <div style={{ position: 'absolute', inset: 0, background: heroProject.coverGradient }} />
                       )}
-
                       <div style={{
                         position: 'absolute',
                         inset: 0,
                         background: 'linear-gradient(to top, rgba(5,8,16,0.96) 0%, rgba(5,8,16,0.40) 50%, rgba(5,8,16,0.08) 100%)',
                       }} />
-
                       <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 1 }}>
                         <span style={{
                           display: 'inline-flex',
@@ -344,15 +354,10 @@ export default function ProjectsPage() {
                           borderRadius: 'var(--radius-badge, 8px)',
                           padding: '0.20rem 0.55rem',
                         }}>
-                          <span style={{
-                            width: '5px', height: '5px', borderRadius: '50%',
-                            backgroundColor: STATUS_STYLES[heroProject.status].dot,
-                            flexShrink: 0,
-                          }} />
+                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: STATUS_STYLES[heroProject.status].dot, flexShrink: 0 }} />
                           {heroProject.status}
                         </span>
                       </div>
-
                       <div style={{ position: 'relative', zIndex: 1, padding: '1.25rem 1.4rem' }}>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginBottom: '0.5rem' }}>
                           {heroProject.category.map((c) => (
@@ -371,7 +376,6 @@ export default function ProjectsPage() {
                             </span>
                           ))}
                         </div>
-
                         <h2 style={{
                           fontFamily: 'var(--font-display, "Cormorant Garamond", Georgia, serif)',
                           fontSize: 'clamp(1.4rem, 2.2vw, 1.85rem)',
@@ -384,7 +388,6 @@ export default function ProjectsPage() {
                         }}>
                           {heroProject.title}
                         </h2>
-
                         <p style={{
                           fontFamily: 'var(--font-sans)',
                           fontSize: '0.78rem',
@@ -396,24 +399,12 @@ export default function ProjectsPage() {
                         }}>
                           {heroProject.tagline}
                         </p>
-
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <span style={{
-                            fontFamily: 'var(--font-sans)',
-                            fontSize: '0.70rem',
-                            fontWeight: 400,
-                            color: 'rgba(255,255,255,0.30)',
-                            letterSpacing: '0.04em',
-                          }}>
+                          <span style={{ fontFamily: 'var(--font-sans)', fontSize: '0.70rem', fontWeight: 400, color: 'rgba(255,255,255,0.30)', letterSpacing: '0.04em' }}>
                             {heroProject.year}
                           </span>
                           <span style={{ color: 'rgba(255,255,255,0.20)', fontSize: '0.7rem' }}>·</span>
-                          <span style={{
-                            fontFamily: 'var(--font-sans)',
-                            fontSize: '0.70rem',
-                            fontWeight: 500,
-                            color: 'var(--color-accent, #699bff)',
-                          }}>
+                          <span style={{ fontFamily: 'var(--font-sans)', fontSize: '0.70rem', fontWeight: 500, color: 'var(--color-accent, #699bff)' }}>
                             View project →
                           </span>
                         </div>
@@ -422,18 +413,9 @@ export default function ProjectsPage() {
                   </Link>
 
                   {featuredStack.length > 0 && (
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '1rem',
-                      height: '100%',
-                    }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}>
                       {featuredStack.map((p) => (
-                        <Link
-                          key={p.id}
-                          href={`/projects/${p.id}`}
-                          style={{ textDecoration: 'none', flex: 1, minHeight: 0, display: 'block' }}
-                        >
+                        <Link key={p.id} href={`/projects/${p.id}`} style={{ textDecoration: 'none', flex: 1, minHeight: 0, display: 'block' }}>
                           <motion.div
                             whileHover={{ scale: 1.012 }}
                             transition={{ duration: 0.24, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
@@ -448,22 +430,9 @@ export default function ProjectsPage() {
                               cursor: 'pointer',
                             }}
                           >
-                            <div style={{
-                              position: 'relative',
-                              height: '90px',
-                              flexShrink: 0,
-                              overflow: 'hidden',
-                            }}>
+                            <div style={{ position: 'relative', height: '90px', flexShrink: 0, overflow: 'hidden' }}>
                               {p.coverImage ? (
-                                <img
-                                  src={p.coverImage}
-                                  alt={p.title}
-                                  style={{
-                                    position: 'absolute', inset: 0,
-                                    width: '100%', height: '100%',
-                                    objectFit: 'cover', objectPosition: 'center',
-                                  }}
-                                />
+                                <img src={p.coverImage} alt={p.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
                               ) : (
                                 <div style={{ position: 'absolute', inset: 0, background: p.coverGradient }} />
                               )}
@@ -481,59 +450,19 @@ export default function ProjectsPage() {
                                   borderRadius: 'var(--radius-badge, 8px)',
                                   padding: '0.16rem 0.45rem',
                                 }}>
-                                  <span style={{
-                                    width: '4px', height: '4px', borderRadius: '50%',
-                                    backgroundColor: STATUS_STYLES[p.status].dot, flexShrink: 0,
-                                  }} />
+                                  <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: STATUS_STYLES[p.status].dot, flexShrink: 0 }} />
                                   {p.status}
                                 </span>
                               </div>
                             </div>
-
-                            <div style={{
-                              flex: 1,
-                              minHeight: 0,
-                              display: 'flex',
-                              flexDirection: 'column',
-                              justifyContent: 'center',
-                              padding: '0.65rem 0.9rem',
-                              gap: '0.2rem',
-                            }}>
-                              <p style={{
-                                fontFamily: 'var(--font-sans)',
-                                fontSize: '0.65rem',
-                                fontWeight: 400,
-                                color: 'rgba(255,255,255,0.25)',
-                                margin: 0,
-                                letterSpacing: '0.02em',
-                              }}>
+                            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0.65rem 0.9rem', gap: '0.2rem' }}>
+                              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 400, color: 'rgba(255,255,255,0.25)', margin: 0, letterSpacing: '0.02em' }}>
                                 {p.year} · {p.category[0]}
                               </p>
-                              <h3 style={{
-                                fontFamily: 'var(--font-sans)',
-                                fontSize: '0.88rem',
-                                fontWeight: 500,
-                                color: 'rgba(255,255,255,0.90)',
-                                margin: 0,
-                                lineHeight: 1.25,
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                              }}>
+                              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '0.88rem', fontWeight: 500, color: 'rgba(255,255,255,0.90)', margin: 0, lineHeight: 1.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {p.title}
                               </h3>
-                              <p style={{
-                                fontFamily: 'var(--font-sans)',
-                                fontSize: '0.72rem',
-                                fontWeight: 300,
-                                color: 'rgba(255,255,255,0.38)',
-                                margin: 0,
-                                lineHeight: 1.4,
-                                overflow: 'hidden',
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
-                              } as React.CSSProperties}>
+                              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.72rem', fontWeight: 300, color: 'rgba(255,255,255,0.38)', margin: 0, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' } as React.CSSProperties}>
                                 {p.tagline}
                               </p>
                             </div>
@@ -542,7 +471,6 @@ export default function ProjectsPage() {
                       ))}
                     </div>
                   )}
-
                 </div>
               </div>
             )}
@@ -572,21 +500,11 @@ export default function ProjectsPage() {
             </div>
 
             {filtered.length === 0 ? (
-              <div style={{
-                padding: '4rem 0',
-                textAlign: 'center',
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.85rem',
-                color: 'rgba(255,255,255,0.20)',
-              }}>
-                No projects with status "{filter}" yet.
+              <div style={{ padding: '4rem 0', textAlign: 'center', fontFamily: 'var(--font-sans)', fontSize: '0.85rem', color: 'rgba(255,255,255,0.20)' }}>
+                No projects with status &quot;{filter}&quot; yet.
               </div>
             ) : (
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                gap: '1rem',
-              }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
                 <AnimatePresence>
                   {filtered.map((p, i) => (
                     <motion.div

@@ -129,21 +129,39 @@ function TechPill({ children }: { children: React.ReactNode }) {
 
 function LinkPill({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '0.35rem',
-      fontFamily: 'var(--font-sans)',
-      fontSize: '0.70rem',
-      fontWeight: 500,
-      color: '#fff',
-      backgroundColor: 'rgba(255,255,255,0.05)',
-      border: '1px solid rgba(255,255,255,0.15)',
-      borderRadius: '6px',
-      padding: '0.2rem 0.5rem',
-      textDecoration: 'none',
-      whiteSpace: 'nowrap',
-    }}>
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '0.35rem',
+        fontFamily: 'var(--font-sans)',
+        fontSize: '0.70rem',
+        fontWeight: 500,
+        color: 'rgba(255,255,255,0.80)',
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.13)',
+        borderRadius: '6px',
+        padding: '0.22rem 0.55rem',
+        textDecoration: 'none',
+        whiteSpace: 'nowrap',
+        transition: 'color 0.15s, border-color 0.15s, background-color 0.15s',
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLAnchorElement;
+        el.style.color = '#fff';
+        el.style.borderColor = 'rgba(255,255,255,0.28)';
+        el.style.backgroundColor = 'rgba(255,255,255,0.09)';
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLAnchorElement;
+        el.style.color = 'rgba(255,255,255,0.80)';
+        el.style.borderColor = 'rgba(255,255,255,0.13)';
+        el.style.backgroundColor = 'rgba(255,255,255,0.05)';
+      }}
+    >
       {children}
       <ExternalLinkIcon />
     </a>
@@ -151,13 +169,13 @@ function LinkPill({ href, children }: { href: string; children: React.ReactNode 
 }
 
 function HeroBanner({ project }: { project: Project }) {
-  const displayRole = (project as any).role || 'Full-stack Developer';
-  const links = (project as any).links || [];
+  const displayRole = project.role || 'Developer';
+  const links = project.links ?? [];
 
   return (
     <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
       <div style={{
-        height: '180px', 
+        height: '180px',
         width: '100%',
         position: 'relative',
         background: project.coverImage
@@ -168,20 +186,20 @@ function HeroBanner({ project }: { project: Project }) {
         justifyContent: 'center',
       }}>
         <span style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            fontFamily: 'var(--font-sans)',
-            fontSize: '0.70rem',
-            fontWeight: 500,
-            color: 'rgba(255,255,255,0.9)',
-            backgroundColor: 'rgba(0,0,0,0.40)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '999px',
-            padding: '0.25rem 0.75rem',
-            backdropFilter: 'blur(8px)',
-          }}>
-            iOS · SwiftUI
+          position: 'absolute',
+          top: '1rem',
+          right: '1rem',
+          fontFamily: 'var(--font-sans)',
+          fontSize: '0.70rem',
+          fontWeight: 500,
+          color: 'rgba(255,255,255,0.9)',
+          backgroundColor: 'rgba(0,0,0,0.40)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '999px',
+          padding: '0.25rem 0.75rem',
+          backdropFilter: 'blur(8px)',
+        }}>
+          {project.platform}
         </span>
 
         <div style={{
@@ -195,41 +213,40 @@ function HeroBanner({ project }: { project: Project }) {
           gap: '4px',
           padding: '10px',
           justifyContent: 'center',
-          alignContent: 'center'
+          alignContent: 'center',
         }}>
-            <div style={{width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#4db6ac'}} />
-            <div style={{width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#ba68c8'}} />
-            <div style={{width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#e57373'}} />
-            <div style={{width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#4fc3f7'}} />
-            <div style={{width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#ffb74d'}} />
-            <div style={{width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#ff8a65'}} />
+          <div style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#4db6ac' }} />
+          <div style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#ba68c8' }} />
+          <div style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#e57373' }} />
+          <div style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#4fc3f7' }} />
+          <div style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#ffb74d' }} />
+          <div style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: '#ff8a65' }} />
         </div>
       </div>
 
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        backgroundColor: 'rgba(255,255,255,0.015)', 
+        backgroundColor: 'rgba(255,255,255,0.015)',
       }}>
         <div style={{ padding: '1rem 1.25rem', borderRight: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           <MetaLabel>STATUS</MetaLabel>
           <StatusBadge status={project.status} />
         </div>
-        
+
         <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <MetaLabel>{links.length > 0 ? 'PLATFORM & LINKS' : 'PLATFORM'}</MetaLabel>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', alignItems: 'flex-start' }}>
+          <MetaLabel>{links.length > 0 ? 'LINKS' : 'PLATFORM'}</MetaLabel>
+          {links.length > 0 ? (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+              {links.map((link, i) => (
+                <LinkPill key={i} href={link.url}>{link.label}</LinkPill>
+              ))}
+            </div>
+          ) : (
             <span style={{ fontFamily: 'var(--font-sans)', fontSize: '0.95rem', fontWeight: 500, color: '#fff' }}>
               {project.platform}
             </span>
-            {links.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                {links.map((link: any, i: number) => (
-                  <LinkPill key={i} href={link.url}>{link.label}</LinkPill>
-                ))}
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
         <div style={{ padding: '1rem 1.25rem', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
@@ -264,10 +281,10 @@ function HookBlock({ project }: { project: Project }) {
   return (
     <div style={{
       borderBottom: '1px solid rgba(255,255,255,0.08)',
-      padding: '1.25rem', 
+      padding: '1.25rem',
       display: 'flex',
       flexDirection: 'column',
-      gap: '0.85rem', 
+      gap: '0.85rem',
       backgroundColor: 'rgba(255,255,255,0.005)',
     }}>
       {rows.map(({ label, text }) => (
@@ -368,47 +385,74 @@ function StoryTab({ project }: { project: Project }) {
           font-family: var(--font-sans);
           font-size: 0.95rem;
           font-weight: 400;
-          color: rgba(255,255,255,0.7);
-          line-height: 1.7;
-          margin: 0 0 1.5rem 0;
-          text-align: justify; 
+          color: rgba(255,255,255,0.70);
+          line-height: 1.75;
+          margin: 0 0 1.4rem 0;
+          text-align: justify;
         }
         .story-prose strong {
-          color: rgba(255,255,255,0.95);
+          color: rgba(255,255,255,0.96);
           font-weight: 600;
         }
         .story-prose em {
           color: var(--color-accent, #699bff);
           font-style: italic;
         }
+        .story-prose h2, .story-prose h3 {
+          font-family: var(--font-sans);
+          font-weight: 500;
+          color: rgba(255,255,255,0.88);
+          letter-spacing: -0.01em;
+          margin: 2rem 0 0.65rem;
+          line-height: 1.3;
+        }
+        .story-prose h2 { font-size: 1.05rem; }
+        .story-prose h3 { font-size: 0.92rem; }
+        .story-prose ul, .story-prose ol {
+          padding-left: 1.4rem;
+          color: rgba(255,255,255,0.68);
+          font-size: 0.93rem;
+          line-height: 1.75;
+          margin: 0.5rem 0 1.4rem;
+        }
+        .story-prose li {
+          margin-bottom: 0.3rem;
+        }
+        .story-prose li::marker {
+          color: rgba(255,255,255,0.25);
+        }
+        .story-prose blockquote {
+          border-left: 2px solid var(--color-accent, #699bff);
+          padding: 0.1rem 0 0.1rem 1rem;
+          margin: 1.2rem 0;
+          font-style: italic;
+          color: rgba(255,255,255,0.50);
+          font-size: 0.92rem;
+        }
+        .story-prose code {
+          font-family: 'SF Mono', 'Fira Code', monospace;
+          font-size: 0.80rem;
+          color: var(--color-accent, #699bff);
+          background: rgba(105,155,255,0.08);
+          padding: 0.10em 0.36em;
+          border-radius: 4px;
+        }
+        .story-prose hr {
+          border: none;
+          border-top: 1px solid rgba(255,255,255,0.07);
+          margin: 2rem 0;
+        }
       `}</style>
-      
-      <div style={{
-        marginTop: '2rem',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.6rem',
-        color: 'rgba(255,255,255,0.4)',
-        fontSize: '0.8rem',
-        fontStyle: 'italic'
-      }}>
-        <div style={{
-            width: '28px', height: '28px', 
-            borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-        }}>↓</div>
-        Continue reading below
-      </div>
     </div>
   );
 }
 
 function CraftTab({ notes }: { notes: string }) {
   return (
-    <div style={{ 
-      padding: 'clamp(1.5rem, 3vw, 2rem)', 
+    <div style={{
+      padding: 'clamp(1.5rem, 3vw, 2rem)',
       maxWidth: '800px',
-      margin: '0 auto'
+      margin: '0 auto',
     }}>
       <div className="craft-prose">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{notes}</ReactMarkdown>
@@ -468,7 +512,13 @@ function CraftTab({ notes }: { notes: string }) {
           margin: 0.65rem 0;
         }
         .craft-prose li { margin-bottom: 0.25rem; }
+        .craft-prose li::marker { color: rgba(255,255,255,0.25); }
         .craft-prose strong { color: rgba(255,255,255,0.85); font-weight: 500; }
+        .craft-prose hr {
+          border: none;
+          border-top: 1px solid rgba(255,255,255,0.07);
+          margin: 1.75rem 0;
+        }
       `}</style>
     </div>
   );
@@ -550,7 +600,7 @@ export default function ProjectsDetail({ project }: { project: Project }) {
         <motion.div
           key={activeTab}
           variants={tabIn}
-          initial={hasInteracted ? "hidden" : false}
+          initial={hasInteracted ? 'hidden' : false}
           animate="visible"
           exit="exit"
         >

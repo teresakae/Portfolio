@@ -23,7 +23,7 @@ export default function LenisProvider({ children }: LenisProviderProps) {
         infinite: false,
       }}
     >
-      {/* @ts-ignore - Bypassing React 19 type mismatch */}
+      {/* @ts-ignore */}
       {children}
     </ReactLenis>
   );
